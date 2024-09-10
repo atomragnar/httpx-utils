@@ -54,6 +54,7 @@ def _create_session(
 
     return client
 
+
 def _get_client(
     settings: ClientSettings,
 ) -> httpx.Client:
