@@ -1,0 +1,48 @@
+name: Build and Release Python Package
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rye
+        run: curl -sSf https://install.rye-up.com | bash
+
+      - name: Set up Rye Path
+        run: echo "${{ github.workspace }}/.rye/bin" >> $GITHUB_PATH
+
+      - name: Install dependencies
+        run: rye sync
+
+      - name: Update pkg
+        run: rye run update-pkg
+
+      - name: Rye format
+        run: rye fmt --check
+
+      - name: Rye lint
+        run: rye lint
+
+      - name: Build the wheel
+        run: rye build --wheel
+
+      - name: Tag the release
+        run: rye run tag-release
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/*.whl
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
