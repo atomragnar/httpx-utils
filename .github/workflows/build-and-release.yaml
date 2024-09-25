@@ -51,6 +51,7 @@ jobs:
         run: |
           VER_TAG="$(rye run release-tag)" && \
           git tag -a $VER_TAG -m "Release $VER_TAG" && \
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/atomragnar/httpx-utils.git && \
           git push origin $VER_TAG
 
       - name: Create GitHub Release
