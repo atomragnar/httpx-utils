@@ -42,8 +42,16 @@ jobs:
       - name: Build the wheel
         run: rye build --wheel
 
+      - name: Configure Git
+        run: |
+          git config --local user.name "GitHub Actions Bot"
+          git config --local user.email "actions@github.com"
+
       - name: Tag the release
-        run: VER_TAG="$(rye run release-tag)" &&  git tag -a $VER_TAG -m "Release $VER_TAG" && git push origin $VER_TAG
+        run: |
+          VER_TAG="$(rye run release-tag)" && \
+          git tag -a $VER_TAG -m "Release $VER_TAG" && \
+          git push origin $VER_TAG
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
