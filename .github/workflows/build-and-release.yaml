@@ -11,7 +11,7 @@ on:
       - main
 
 jobs:
-  build:
+  create_tag:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
@@ -40,9 +40,6 @@ jobs:
       - name: Rye lint
         run: rye lint
 
-      - name: Build the wheel
-        run: rye build --wheel
-
       - name: Configure Git
         run: |
           git config --local user.name "GitHub Actions Bot"
@@ -55,19 +52,39 @@ jobs:
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/atomragnar/httpx-utils.git && \
           git push origin $VER_TAG
 
-      - name: Fetch all tags and refs
-        run: |
-          git fetch --tags
+  create_release:
+    needs: create_tag 
+    runs-on: ubuntu-latest
 
-      - name: Check for fetched tags
-        run: git tag 
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: true
+          fetch-depth: 0  
+
+      - name: Install Rye
+        run: curl -sSf https://rye.astral.sh/get | RYE_INSTALL_OPTION="--yes" bash
+
+      - name: Add Rye to PATH
+        run: echo "$HOME/.rye/shims:$HOME/.rye/bin" >> $GITHUB_PATH
+
+      - name: Check rye path
+        run: which rye
+
+      - name: Install dependencies
+        run: rye sync
+
+      - name: Build the wheel
+        run: rye build --wheel
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: dist/*.whl
           token: ${{ secrets.GITHUB_TOKEN }}
-          make_latest: true
+
 
   checks:
     if: github.event_name == 'pull_request'
