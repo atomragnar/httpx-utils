@@ -17,10 +17,23 @@ build-backend = "hatchling.build"
 
 [tool.rye]
 managed = true
-dev-dependencies = []
+dev-dependencies = [
+    "msgspec>=0.18.6",
+    "gitpython>=3.1.43",
+    "colorama>=0.4.6",
+]
+
+[tool.rye.scripts]
+update-pkg = "python scripts/release_script.py update-pkg"
+update-version = "python scripts/release_script.py update-version"
+tag-release = "python scripts/release_script.py patch-release"
 
 [tool.hatch.metadata]
 allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/httpx_utils"]
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"

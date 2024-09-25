@@ -1,0 +1,76 @@
+name: Build and Release Python Package
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rye
+        run: curl -sSf https://rye.astral.sh/get | RYE_INSTALL_OPTION="--yes" bash
+
+      - name: Add Rye to PATH
+        run: echo "$HOME/.rye/shims:$HOME/.rye/bin" >> $GITHUB_PATH
+
+      - name: Check rye path
+        run: which rye
+
+      - name: Install dependencies
+        run: rye sync
+
+      - name: Update pkg
+        run: rye run update-pkg
+
+      - name: Rye format
+        run: rye fmt --check
+
+      - name: Rye lint
+        run: rye lint
+
+      - name: Build the wheel
+        run: rye build --wheel
+
+      - name: Tag the release
+        run: rye run tag-release
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/*.whl
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  checks:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rye
+        run: curl -sSf https://rye.astral.sh/get | RYE_INSTALL_OPTION="--yes" bash
+
+      - name: Add Rye to PATH
+        run: echo "$HOME/.rye/shims:$HOME/.rye/bin" >> $GITHUB_PATH
+
+      - name: Check rye path
+        run: which rye
+
+      - name: Install dependencies
+        run: rye sync
+
+      - name: Rye format
+        run: rye fmt --check
+
+      - name: Rye lint
+        run: rye lint --fix
