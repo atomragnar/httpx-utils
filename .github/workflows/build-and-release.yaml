@@ -20,7 +20,7 @@ jobs:
         run: curl -sSf https://rye.astral.sh/get | RYE_INSTALL_OPTION="--yes" bash
 
       - name: Set up Rye Path
-        run: source "$HOME/.rye/env"
+        run: echo "$HOME/.rye/shims:$HOME/.rye/bin" >> $GITHUB_PATH
 
       - name: Check rye path
         run: which rye
