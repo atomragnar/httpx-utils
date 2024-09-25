@@ -33,9 +33,6 @@ jobs:
       - name: Install dependencies
         run: rye sync
 
-      - name: Update version and commit changes
-        run: rye run tag-release
-
       - name: Rye format
         run: rye fmt --check
 
@@ -45,8 +42,11 @@ jobs:
       - name: Build the wheel
         run: rye build --wheel
 
+      - name: Tag the release
+        run: VER_TAG="$(rye run release-tag)" &&  git tag -a $VER_TAG -m "Release $VER_TAG" && git push origin $VER_TAG
+
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: dist/*.whl
         env:
