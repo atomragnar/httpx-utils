@@ -255,29 +255,30 @@ def update_pyproject(parser_args: argparse.Namespace) -> None:
     pyproject.write()
 
 
-@action("patch-version")
+@action("update-version")
 def update_version(parser_args: argparse.Namespace) -> None:
+    logger.info(f"args {parser_args}")
     py = Pyproject()
     logger.info(f"Current version: {py.version}")
     git = GitUtils()
     latest_tag = git.get_latest_tag()
     if latest_tag is None:
-        new_tag = f"v{py.version}"
-        git.tag_and_push(new_tag)
         return
     py.increment_version()
     new_tag = f"{py.version}"
     git.tag_and_push(new_tag)
     py.write()
 
-    # Commit and push the version change to Git
-    git.repo.git.add(py._file_path)  # Staging the pyproject.toml file
-    git.repo.index.commit(f"chore: bump version to {new_tag}")
+    git.repo.git.add(py._file_path)
+    git.repo.index.commit(f"chore: bump pyproject.toml version to {new_tag}")
     origin = git.repo.remotes.origin
     origin.push()
 
-    # Finally, create a new tag and push it
-    git.tag_and_push(new_tag)
+
+@action("release-tag")
+def release_tag(parser_args: argparse.Namespace) -> None:
+    py = Pyproject()
+    print(f"v{py.version}")
 
 
 @action("git-test")
