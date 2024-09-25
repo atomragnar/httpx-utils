@@ -270,6 +270,15 @@ def update_version(parser_args: argparse.Namespace) -> None:
     git.tag_and_push(new_tag)
     py.write()
 
+    # Commit and push the version change to Git
+    git.repo.git.add(py._file_path)  # Staging the pyproject.toml file
+    git.repo.index.commit(f"chore: bump version to {new_tag}")
+    origin = git.repo.remotes.origin
+    origin.push()
+
+    # Finally, create a new tag and push it
+    git.tag_and_push(new_tag)
+
 
 @action("git-test")
 def git_test(parser_args: argparse.Namespace) -> None:
