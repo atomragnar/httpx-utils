@@ -27,7 +27,7 @@ dev-dependencies = [
 [tool.rye.scripts]
 update-pkg = "python scripts/release_script.py update-pkg"
 update-version = "python scripts/release_script.py update-version"
-tag-release = "python scripts/release_script.py patch-release"
+tag-release = "python scripts/release_script.py patch-version"
 
 [tool.hatch.metadata]
 allow-direct-references = true
