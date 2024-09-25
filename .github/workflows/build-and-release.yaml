@@ -57,7 +57,6 @@ jobs:
 
       - name: Fetch all tags and refs
         run: |
-          git fetch --prune --unshallow 
           git fetch --tags
 
       - name: Check for fetched tags
