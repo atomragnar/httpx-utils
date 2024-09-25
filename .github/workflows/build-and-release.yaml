@@ -54,6 +54,9 @@ jobs:
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/atomragnar/httpx-utils.git && \
           git push origin $VER_TAG
 
+      - name: Fetch tags to update Git context
+        run: git fetch --tags
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
