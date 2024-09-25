@@ -20,6 +20,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           persist-credentials: true
+          fetch-depth: 0
 
       - name: Install Rye
         run: curl -sSf https://rye.astral.sh/get | RYE_INSTALL_OPTION="--yes" bash
@@ -54,8 +55,13 @@ jobs:
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/atomragnar/httpx-utils.git && \
           git push origin $VER_TAG
 
-      - name: Fetch tags to update Git context
-        run: git fetch --tags
+      - name: Fetch all tags and refs
+        run: |
+          git fetch --prune --unshallow 
+          git fetch --tags
+
+      - name: Check for fetched tags
+        run: git tag 
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
