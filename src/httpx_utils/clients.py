@@ -11,9 +11,8 @@ from typing import (
 
 from .async_builder import Client as CustomAsyncClient
 from .async_builder import ClientBuilder as AsyncClientBuilder
-from .settings import AuthType, ClientSettings
+from .settings import AuthType
 from .sync_builder import Client as CustomSyncClient
-from .sync_builder import ClientBuilder as SyncClientBuilder
 
 T = TypeVar("T", bound="AsyncBaseClientWrapper")
 V = TypeVar("V", bound="SyncBaseClientWrapper")
