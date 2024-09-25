@@ -34,7 +34,7 @@ jobs:
         run: rye sync
 
       - name: Update version and commit changes
-        run: rye run patch-version
+        run: rye run tag-release
 
       - name: Rye format
         run: rye fmt --check
