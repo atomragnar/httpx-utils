@@ -20,7 +20,10 @@ jobs:
         run: curl -sSf https://rye.astral.sh/get | RYE_INSTALL_OPTION="--yes" bash
 
       - name: Set up Rye Path
-        run: . "$HOME/.rye/env"
+        run: source "$HOME/.rye/env"
+
+      - name: Check rye path
+        run: which rye
 
       - name: Install dependencies
         run: rye sync
