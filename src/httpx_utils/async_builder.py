@@ -71,8 +71,8 @@ async def _fetch_paginated(
     params = params or {}
     params[page_key] = 1
     params["limit"] = limit
-    url = _format_url(client.settings, ext)
-    headers = client.settings.headers.copy()
+    url = _format_url(client._settings, ext)
+    headers = client._settings.headers.copy()
     while True:
         async with client.client as c:
             response = await c.get(url, headers=headers, params=params)
@@ -114,9 +114,15 @@ class Client:
         page_key: str = "page",
         limit: int = 100,
     ) -> AsyncGenerator[Any, Any]:
+        if self._settings is None:
+            raise Exception("Failed to get: Missing clientsettings")
         if paginate:
             async for data in _fetch_paginated(
-                client=self, ext=ext, params=params, page_key=page_key, limit=limit
+                client=self,
+                ext=ext,
+                params=params,
+                page_key=page_key,
+                limit=limit,
             ):
                 yield data
         else:
