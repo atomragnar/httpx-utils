@@ -53,7 +53,7 @@ jobs:
           git push origin $VER_TAG
 
   create_release:
-    needs: create_tag 
+    needs: create_tag
     runs-on: ubuntu-latest
 
     steps:
@@ -62,7 +62,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           persist-credentials: true
-          fetch-depth: 0  
+          fetch-depth: 0
 
       - name: Install Rye
         run: curl -sSf https://rye.astral.sh/get | RYE_INSTALL_OPTION="--yes" bash
@@ -83,7 +83,7 @@ jobs:
         id: tag
         run: |
           TAG="$(rye run release-tag)" && \
-          echo "::set-output name=release_tag::$TAG"
+          echo "release_tag=$TAG" >> "$GITHUB_OUTPUT"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -91,7 +91,6 @@ jobs:
           tag_name: ${{ steps.tag.outputs.release_tag }}
           files: dist/*.whl
           token: ${{ secrets.GITHUB_TOKEN }}
-
 
   checks:
     if: github.event_name == 'pull_request'

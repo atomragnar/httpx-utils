@@ -97,8 +97,8 @@ def _fetch_paginated(
     params = params or {}
     params[page_key] = 1
     params["limit"] = limit
-    url = _format_url(client.settings, ext)
-    headers = client.settings.headers.copy()
+    url = _format_url(client._settings, ext)
+    headers = client._settings.headers.copy()
     while True:
         response = client.client.get(url, headers=headers, params=params)
         data = response.json()
@@ -139,9 +139,15 @@ class Client:
         page_key: str = "page",
         limit: int = 100,
     ) -> Generator[Any, Any, None]:
+        if self._settings is None:
+            raise Exception("Failed to get: Missing clientsettings settings")
         if paginate:
             for data in _fetch_paginated(
-                client=self, ext=ext, params=params, page_key=page_key, limit=limit
+                client=self,
+                ext=ext,
+                params=params,
+                page_key=page_key,
+                limit=limit,
             ):
                 yield data
         else:
