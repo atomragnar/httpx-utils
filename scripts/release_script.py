@@ -264,9 +264,9 @@ def update_version(parser_args: argparse.Namespace) -> None:
     latest_tag = git.get_latest_tag()
     if latest_tag is None:
         return
+
     py.increment_version()
     new_tag = f"{py.version}"
-    git.tag_and_push(new_tag)
     py.write()
 
     git.repo.git.add(py._file_path)

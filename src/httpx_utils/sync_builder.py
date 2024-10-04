@@ -6,27 +6,6 @@ from .helpers import check_status_codes
 from .settings import AuthType, ClientSettings
 
 
-# def _create_session(
-#     login_url: str,
-#     username: str,
-#     password: str,
-#     verify: bool,
-#     login_status_codes: List[int],
-# ) -> httpx.Client:
-#     if login_url and username and password:
-#         with httpx.Client(verify=verify) as client:
-#             response = client.post(
-#                 login_url,
-#                 json={"username": username, "password": password},
-#             )
-#             print(response)
-#             print(response.headers)
-#             print(response.cookies)
-#             if not check_status_codes(login_status_codes, response):
-#                 raise Exception("Failed to create session")
-#             return httpx.Client(cookies=response.cookies, verify=verify)
-#     raise Exception("Failed to create session: Missing client settings")
-#
 def _create_session(
     login_url: str,
     username: str,
@@ -42,7 +21,6 @@ def _create_session(
     payload = {"username": username, "password": password}
     headers = {
         "Content-Type": "application/x-www-form-urlencoded",
-        "User-Agent": "Mozilla/5.0",
     }
 
     response = client.post(login_url, data=payload, headers=headers)
