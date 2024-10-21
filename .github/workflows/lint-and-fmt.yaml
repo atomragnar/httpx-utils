@@ -1,0 +1,23 @@
+name: ruff lint and format
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  checks:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install UV
+        uses: astral-sh/setup-uv@v3
+
+      - name: Install Just
+        uses: extractions/setup-just@v2
+
+      - name: Run checks
+        run: just check

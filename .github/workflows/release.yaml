@@ -1,0 +1,72 @@
+---
+name: create release
+# on:
+#   push:
+#     branches: [main]
+on: workflow_dispatch
+jobs:
+  create_tag:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: true
+          fetch-depth: 0
+      - name: Install UV
+        uses: astral-sh/setup-uv@v3
+      - name: Install Just
+        uses: extractions/setup-just@v2
+      - name: check uv path
+        run: which uv
+      - name: Install dependencies
+        run: just install
+      - name: Configure Git
+        run: |
+          git config --local user.name "GitHub Actions Bot"
+          git config --local user.email "actions@github.com"
+      - name: Update pyproject version
+        run: |
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/atomragnar/httpx-utils.git && \
+          just update-pyproject-version
+      - name: Tag the release
+        run: |
+          VER_TAG="$(just release-tag)" && \
+          git tag -a $VER_TAG -m "Release $VER_TAG" && \
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/atomragnar/httpx-utils.git && \
+          git push origin $VER_TAG
+  create-release:
+    needs: create_tag
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: true
+          fetch-depth: 0
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+      - name: Install Just
+        uses: extractions/setup-just@v2
+      - name: Set up dependencies
+        run: just install
+      - name: update repo
+        run: |
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/atomragnar/httpx-utils.git && \
+          git pull
+      - name: Build the wheel
+        run: just build
+      - name: Get tag
+        id: tag
+        run: |
+          TAG="$(just release-tag)" && \
+          echo "release_tag=$TAG" >> "$GITHUB_OUTPUT"
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.release_tag }}
+          files: dist/*.whl
+          token: ${{ secrets.GITHUB_TOKEN }}
