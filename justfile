@@ -16,7 +16,7 @@ check:
     uv run mypy ./src
 
 test:
-   @uv run pytest tests/tests.py
+   @uv run pytest tests/*.py
 
 build:
     @uv build --wheel
