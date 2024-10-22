@@ -6,8 +6,8 @@ from enum import Enum
 from typing import Any, Dict, List, Optional, Tuple
 
 import git
-from msgspec.toml import decode as toml_decode
-from msgspec.toml import encode as toml_encode
+import tomli
+import tomli_w
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -60,6 +60,16 @@ class ArgumentParser:
 ## helper functions
 
 
+def _read_toml_file(file_path: str) -> Dict[str, Any]:
+    with open(file_path, "rb") as file:
+        return tomli.load(file)
+
+
+def _write_toml_file(file_path: str, data: Dict[str, Any]) -> None:
+    with open(file_path, "wb") as file:
+        tomli_w.dump(data, file)
+
+
 def _remove_duplicates(package_list: List[str]) -> List[str]:
     seen: set[str] = set()
     unique_packages: List[str] = []
@@ -108,9 +118,7 @@ class Pyproject:
             self._file_path = f"{file_path}/pyproject.toml"
         else:
             self._file_path = file_path
-        with open(self._file_path, "rb") as file:
-            data = file.read()
-        self._data = toml_decode(buf=data, type=Dict)
+        self._data = _read_toml_file(self._file_path)
 
     @property
     def version(self) -> str:
@@ -183,9 +191,7 @@ class Pyproject:
         )
 
     def write(self) -> None:
-        binary_data = toml_encode(self._data)
-        with open(self._file_path, "wb") as file:
-            file.write(binary_data)
+        _write_toml_file(self._file_path, self._data)
 
 
 # git utils
