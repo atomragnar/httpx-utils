@@ -349,6 +349,42 @@ class Client:
         response = self._client.post(url, headers=headers, json=data)
         return response.json()
 
+    def put(
+        self,
+        ext: str,
+        data: Optional[Dict[str, Any]] = None,
+        custom_headers: Optional[Dict[str, str]] = None,
+    ) -> Dict[str, Any]:
+        if self._settings is None:
+            raise Exception("Failed to put: Missing settings")
+
+        headers = self._settings.headers.copy()
+        if custom_headers:
+            headers.update(custom_headers)
+
+        url = _format_url(self._settings, ext)
+        response = self._client.put(url, headers=headers, json=data)
+
+        return response.json()
+
+    def delete(
+        self,
+        ext: str,
+        params: Optional[Dict[str, Any]] = None,
+        custom_headers: Optional[Dict[str, str]] = None,
+    ) -> Dict[str, Any]:
+        if self._settings is None:
+            raise Exception("Failed to delete: Missing settings")
+
+        headers = self._settings.headers.copy()
+        if custom_headers:
+            headers.update(custom_headers)
+
+        url = _format_url(self._settings, ext)
+        response = self._client.delete(url, headers=headers, params=params)
+
+        return response.json()
+
     @property
     def client(self):
         return self._client
@@ -527,6 +563,42 @@ class AsyncClient:
                 headers[k] = v
         url = _format_url(self._settings, ext)
         response = await self._client.post(url, headers=headers, json=data)
+        return response.json()
+
+    async def put(
+        self,
+        ext: str,
+        data: Optional[Dict[str, Any]] = None,
+        custom_headers: Optional[Dict[str, str]] = None,
+    ) -> Dict[str, Any]:
+        if self._settings is None:
+            raise Exception("Failed to put: Missing settings")
+
+        headers = self._settings.headers.copy()
+        if custom_headers:
+            headers.update(custom_headers)
+
+        url = _format_url(self._settings, ext)
+        response = await self._client.put(url, headers=headers, json=data)
+
+        return response.json()
+
+    async def delete(
+        self,
+        ext: str,
+        params: Optional[Dict[str, Any]] = None,
+        custom_headers: Optional[Dict[str, str]] = None,
+    ) -> Dict[str, Any]:
+        if self._settings is None:
+            raise Exception("Failed to delete: Missing settings")
+
+        headers = self._settings.headers.copy()
+        if custom_headers:
+            headers.update(custom_headers)
+
+        url = _format_url(self._settings, ext)
+        response = await self._client.delete(url, headers=headers, params=params)
+
         return response.json()
 
     @property
