@@ -483,7 +483,7 @@ async def _async_fetch_paginated(
                     yield item
             else:
                 yield return_data
-            if len(data) < limit:
+            if len(return_data) < limit:
                 break
             params[page_key] += 1
 
